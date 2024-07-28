@@ -65,6 +65,7 @@ function createNewResponse(extraClass = '') {
 
     var botResponse = document.createElement("div");
     botResponse.className = `rounded-tl-lg rounded-tr-lg rounded-br-lg p-2 bg-gray-800 text-white dark:bg-gray-800 ${extraClass}`;
+    botResponse.style.backgroundColor = "#e07000";
     botResponse.innerHTML = '';
 
     convoContainer.appendChild(botResponse);
@@ -294,7 +295,7 @@ function createChatWidget() {
             width: 10px;
             height: 10px;
             margin: 3px;
-            background-color: #1b2d3e;
+            background-color: #e07000;
             border-radius: 50%;
             display: inline-block;
             animation: bounce 1.4s infinite ease-in-out both;
@@ -392,6 +393,16 @@ function createChatWidget() {
     }, 5000);
 
     // chat chips
+    var style = document.createElement('style');
+    style.innerHTML = `
+        .chat-chip-hover:hover {
+            background-color: #ff8c00 !important;
+            color: white !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Create chat chips container
     var chatChipsContainer = document.createElement("div");
     chatChipsContainer.setAttribute("id", "chips-container");
     chatChipsContainer.className = "flex flex-row space-x-0.5 sm:space-x-1 md:space-x-2 px-0.5 sm:px-1 md:px-2 pt-2";
@@ -399,16 +410,19 @@ function createChatWidget() {
     const chipsText = ["Tell me about Princeton", "Application Deadlines?", "Financial Aid?"]
     chipsText.forEach((text) => {
         var chatChip = document.createElement("div");
-        chatChip.className = "text-gray-800 px-3 py-1 rounded-full flex-grow text-xs text-center border-4 border-gray-600 hover:bg-gray-600 hover:text-white cursor-pointer";
+        chatChip.className = "text-gray-800 px-3 py-1 rounded-full flex-grow text-xs text-center border-4 cursor-pointer chat-chip-hover";
+        chatChip.style.borderColor = "#ff8c00";
+        chatChip.style.borderStyle = "solid";
         chatChip.innerText = text;
         chatChipsContainer.appendChild(chatChip);
 
         chatChip.addEventListener("click", () => {
             pushNewUserChat(text);
         });
-    })
+    });
 
     chatWidget.appendChild(chatChipsContainer);
+
 
     // chat input
 
@@ -485,6 +499,7 @@ function createCircleIcon() {
     circleIcon.className = "bg-gray-800 p-3"
     
     // Style circle icon
+    circleIcon.style.backgroundColor = "#ff8c00";
     circleIcon.style.position = "fixed";
     circleIcon.style.bottom = "20px";
     circleIcon.style.right = "20px";
@@ -516,6 +531,7 @@ function renderChats() {
 
         if (chat.role === "bot") {
             newChat.className = "rounded-tl-lg rounded-tr-lg rounded-br-lg p-2 bg-gray-800 text-white dark:bg-gray-800";
+            newChat.style.backgroundColor = "#e07000";
         } else {
             newChat.className = "rounded-tl-lg rounded-tr-lg rounded-bl-lg p-2 bg-gray-100 dark:bg-gray-800";
         }
