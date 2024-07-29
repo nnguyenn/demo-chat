@@ -30,7 +30,7 @@ const chatEndpointURL = 'https://us-central1-composite-wind-430319-r9.cloudfunct
 // track conversation with array
 const chatList = [{
     role: "bot",
-    text: "Hey there! What are you looking for today?"
+    text: "Hey there! How can I help you today?"
 }]
 
 function scrollToBottom(containerId) {
