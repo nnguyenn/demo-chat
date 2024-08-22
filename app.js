@@ -65,7 +65,6 @@ function createNewResponse(extraClass = '') {
 
     var botResponse = document.createElement("div");
     botResponse.className = `rounded-tl-lg rounded-tr-lg rounded-br-lg p-2 bg-gray-800 text-white dark:bg-gray-800 ${extraClass}`;
-    botResponse.style.backgroundColor = "#e07000";
     botResponse.innerHTML = '';
 
     convoContainer.appendChild(botResponse);
@@ -209,20 +208,20 @@ function createChatWidget() {
     chatWidget.style.position = "fixed";
     chatWidget.style.bottom = "84px";
     chatWidget.style.right = "20px";
-    chatWidget.style.maxWidth = "400px";
-    chatWidget.style.maxHeight = "664px";
+    chatWidget.style.width = "400px";
+    chatWidget.style.maxHeight = "764px";
     chatWidget.style.zIndex = "1000";
     chatWidget.style.display = "none"; // Hide initially
 
     // Append chat widget to the body
     document.body.appendChild(chatWidget);
-
+    var styleElement = document.createElement("style");
     chatWidget.innerHTML = `
         <div class="flex flex-col space-y-1.5 p-6 border-b" data-id="8">
             <div class="flex-1" data-id="9">
-                <h2 class="text-lg font-bold leading-none mb-2" data-id="10">Welcome to Princeton Admissions!</h2>
+                <h2 class="text-lg font-bold leading-none mb-2" data-id="10">Welcome to AAMU Admissions!</h2>
                 <p class="text-sm leading-none text-gray-500 dark:text-gray-400" data-id="11">
-                    Ask me anything about Princeton!
+                    Ask me anything about AAMU!
                 </p>
             </div>
         </div>
@@ -295,7 +294,7 @@ function createChatWidget() {
             width: 10px;
             height: 10px;
             margin: 3px;
-            background-color: #e07000;
+            background-color: #1b2d3e;
             border-radius: 50%;
             display: inline-block;
             animation: bounce 1.4s infinite ease-in-out both;
@@ -318,33 +317,22 @@ function createChatWidget() {
             }
         }
         
-        @keyframes unravel {
-            0% {
-                height: 0;
-                opacity: 0;
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
             }
-            100% {
-                height: 70%;
-                opacity: 1;
-            }
-        }
-
-        @keyframes ravel {
-            0% {
-                height: 70%;
-                opacity: 1;
-            }
-            100% {
-                height: 0;
-                opacity: 0;
+            40% {
+                transform: scale(1);
             }
         }
     
+    
         #chat-widget {
-            height: 0;
+            transform: scale(0);
             opacity: 0;
-            overflow: hidden;
-            animation: unravel 0.5s forwards;
+            display: none;
+            transform-origin: bottom right;
+            transition: transform 0.5s ease, opacity 0.5s ease;
         }
     `;
     document.head.appendChild(styleElement);
@@ -393,33 +381,21 @@ function createChatWidget() {
     }, 5000);
 
     // chat chips
-    var style = document.createElement('style');
-    style.innerHTML = `
-        .chat-chip-hover:hover {
-            background-color: #ff8c00 !important;
-            color: white !important;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Create chat chips container
     var chatChipsContainer = document.createElement("div");
     chatChipsContainer.setAttribute("id", "chips-container");
     chatChipsContainer.className = "flex flex-row space-x-0.5 sm:space-x-1 md:space-x-2 px-0.5 sm:px-1 md:px-2 pt-2";
 
-    const chipsText = ["Tell me about Princeton", "Application Deadlines?", "Financial Aid?"]
+    const chipsText = ["Tell me about Alabama AAMU", "How do I apply?", "Financial Aid"]
     chipsText.forEach((text) => {
         var chatChip = document.createElement("div");
-        chatChip.className = "text-gray-800 px-3 py-1 rounded-full flex-grow text-xs text-center border-4 cursor-pointer chat-chip-hover";
-        chatChip.style.borderColor = "#ff8c00";
-        chatChip.style.borderStyle = "solid";
+        chatChip.className = "text-gray-800 px-3 py-1 rounded-full flex-grow text-xs text-center border-4 border-gray-600 hover:bg-gray-600 hover:text-white cursor-pointer";
         chatChip.innerText = text;
         chatChipsContainer.appendChild(chatChip);
 
         chatChip.addEventListener("click", () => {
             pushNewUserChat(text);
         });
-    });
+    })
 
     chatWidget.appendChild(chatChipsContainer);
 
@@ -469,22 +445,33 @@ function toggleChatWidget() {
     var notificationCircle = document.getElementById("notification-circle");
     var welcomeText = document.getElementById("welcome-text");
 
-    if (chatWidget.style.display === "none") {
+    if (chatWidget.style.display === "none" || chatWidget.style.display === "") {
+        // Maximize the chat widget from bottom right
         chatWidget.style.display = "flex";
-        chatWidget.style.animation = "none"; // Reset animation
-        chatWidget.offsetHeight; // Trigger reflow
-        chatWidget.style.animation = "unravel 0.5s forwards"; // Apply unravel animation
+        requestAnimationFrame(() => {
+            chatWidget.style.transformOrigin = "bottom right";
+            chatWidget.style.transform = "scale(1)";
+            chatWidget.style.opacity = "1";
+        });
+        // Change the icon to exit
         circleIcon.innerHTML = exitLogoSVG;
-        notificationCircle.style.display = "none";
-        if (welcomeText) {
-            welcomeText.style.display = "none"; // Hide welcome text on click
-        }
+
+        // Hide the notification and welcome text
+        if (notificationCircle) notificationCircle.style.display = "none";
+        if (welcomeText) welcomeText.style.display = "none";
+
     } else {
-        chatWidget.style.animation = "ravel 0.5s forwards"; // Apply ravel animation
+        // Minimize the chat widget to bottom right
+        chatWidget.style.transformOrigin = "bottom right";
+        chatWidget.style.transform = "scale(0)";
+        chatWidget.style.opacity = "0";
+        chatWidget.style.transition = "transform 0.5s ease, opacity 0.5s ease";
+
         setTimeout(() => {
             chatWidget.style.display = "none";
+            // Change the icon back to chat
             circleIcon.innerHTML = chatLogoSVG;
-        }, 500); // Match the duration of the ravel animation
+        }, 500); // Match the duration of the transition
     }
 }
 
@@ -499,7 +486,6 @@ function createCircleIcon() {
     circleIcon.className = "bg-gray-800 p-3"
     
     // Style circle icon
-    circleIcon.style.backgroundColor = "#ff8c00";
     circleIcon.style.position = "fixed";
     circleIcon.style.bottom = "20px";
     circleIcon.style.right = "20px";
@@ -513,10 +499,18 @@ function createCircleIcon() {
     circleIcon.style.color = "#fff";
     circleIcon.style.fontSize = "24px";
     circleIcon.style.zIndex = "1000";
+    circleIcon.style.transition = "transform 0.2s ease";
 
     circleIcon.innerHTML = chatLogoSVG;
 
-    circleIcon.addEventListener("click", toggleChatWidget);
+    // Shrink the icon when clicked and stay small when held
+    circleIcon.addEventListener("mousedown", () => {
+        circleIcon.style.transform = "scale(0.8)";
+    });
+    circleIcon.addEventListener("mouseup", () => {
+        circleIcon.style.transform = "scale(1)";
+        toggleChatWidget();
+    });
 
     document.body.appendChild(circleIcon);
 }
@@ -531,7 +525,6 @@ function renderChats() {
 
         if (chat.role === "bot") {
             newChat.className = "rounded-tl-lg rounded-tr-lg rounded-br-lg p-2 bg-gray-800 text-white dark:bg-gray-800";
-            newChat.style.backgroundColor = "#e07000";
         } else {
             newChat.className = "rounded-tl-lg rounded-tr-lg rounded-bl-lg p-2 bg-gray-100 dark:bg-gray-800";
         }
